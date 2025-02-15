@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  sd-webui-browser:
+    build: .
+    ports:
+      - "7888:7888"
+    volumes:
+      -  /data/sd-generated/:/data
+    environment:
+      - IIB_ACCESS_CONTROL_ALLOWED_PATHS=/data
