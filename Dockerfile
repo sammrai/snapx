@@ -9,5 +9,8 @@ RUN git clone https://github.com/zanllp/sd-webui-infinite-image-browsing.git /ap
 WORKDIR /app
 RUN pip install --no-cache-dir -r requirements.txt
 
+# プラグインのインストール
+ADD plugins /app/plugins/
+
 # コンテナ起動時のコマンド
 CMD ["python", "app.py", "--port=7888", "--host=0.0.0.0"]
