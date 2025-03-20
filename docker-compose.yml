@@ -6,7 +6,9 @@ services:
     ports:
       - "7888:7888"
     volumes:
-      -  /data/sd-generated/:/data
+      - /data/sd-generated/:/data
+      - /data/snapx/cache/:/cache
       - /etc/localtime:/etc/localtime:ro
     environment:
       - IIB_ACCESS_CONTROL_ALLOWED_PATHS=/data
+      - IIB_CACHE_DIR=/cache

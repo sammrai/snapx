@@ -103,37 +103,41 @@ class Main:
             raise Exception("The input image does not match the current parser.")
         info = extract_metadata(file_path)
         
-        prompt = info['parameters'].pop("prompt")
-        lora_pattern = r'<lora:([^:]+):([\d.]+)>'
-        lora_matches = re.findall(lora_pattern, prompt)
-        loras = [{"name": name, "value": float(weight)} for name, weight in lora_matches]
-        meta = info["parameters"]
-        negative_prompt = meta.pop("negative_prompt")
-        meta.pop("seed")
+        try:
+            prompt = info['parameters'].pop("prompt")
+            lora_pattern = r'<lora:([^:]+):([\d.]+)>'
+            lora_matches = re.findall(lora_pattern, prompt)
+            loras = [{"name": name, "value": float(weight)} for name, weight in lora_matches]
+            meta = info["parameters"]
+            negative_prompt = meta.pop("negative_prompt")
+            meta.pop("seed")
 
-        app_meta = {
-          "Steps": meta["steps"],
-          "Seed": info["info"]["seed"] ,
-          "CFG scale": meta["cfg_scale"],
-          "Sampler": info["options"]["sd_model_checkpoint"],
-          "Clip skip": info["options"].get("CLIP_stop_at_last_layers", ""),
-          "original_filename": info.get("original_filename", ""),
-        }
-
-        if not info:
-            return ImageGenerationInfo()
-
-        params = {
-            "meta": meta,
-            "pos_prompt": clean_prompt(prompt),
-            "extra": {'lora': loras}
+            app_meta = {
+            "Steps": meta["steps"],
+            "Seed": info["info"]["seed"] ,
+            "CFG scale": meta["cfg_scale"],
+            "Sampler": info["options"]["sd_model_checkpoint"],
+            "Clip skip": info["options"].get("CLIP_stop_at_last_layers", ""),
+            "original_filename": info.get("original_filename", ""),
             }
-        return ImageGenerationInfo(
-            ", ".join(clean_prompt(prompt)) + "\nNegative prompt: " + ", ".join(clean_prompt(negative_prompt)) + "\n" + dict_to_string(app_meta) + ", " + dict_to_string(meta),
-            ImageGenerationParams(
-                meta=params["meta"], pos_prompt=params["pos_prompt"], extra=params
-            ),
-        )
+
+            if not info:
+                return ImageGenerationInfo()
+
+            params = {
+                "meta": meta,
+                "pos_prompt": clean_prompt(prompt),
+                "extra": {'lora': loras}
+                }
+            return ImageGenerationInfo(
+                ", ".join(clean_prompt(prompt)) + "\nNegative prompt: " + ", ".join(clean_prompt(negative_prompt)) + "\n" + dict_to_string(app_meta) + ", " + dict_to_string(meta),
+                ImageGenerationParams(
+                    meta=params["meta"], pos_prompt=params["pos_prompt"], extra=params
+                ),
+            )
+        except Exception as e:
+            print(e)
+            return ImageGenerationInfo()
 
     @classmethod
     def test(clz, img: Image, file_path: str):
