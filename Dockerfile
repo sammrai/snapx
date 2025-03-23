@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 ADD plugins /app/plugins/
 
 # コンテナ起動時のコマンド
-CMD ["python", "app.py", "--port=7888", "--host=0.0.0.0", "--generate_image_cache"]
+CMD ["python", "app.py", "--port=7888", "--host=0.0.0.0"]
