@@ -86,7 +86,9 @@ def dict_to_string(data):
     for key, value in data.items():
         if value is None or value == "": continue
         if isinstance(value, dict):
-            value = ", ".join(f'"{k}: {v}"' for k, v in value.items())
+            value = '"'+str(value)+'"'
+        if isinstance(value, list):
+            value = str(value).replace(","," ")
         result.append(f"{key}: {value}")
 
     return ", ".join(result)
@@ -113,12 +115,13 @@ class Main:
             meta.pop("seed")
 
             app_meta = {
-            "Steps": meta["steps"],
-            "Seed": info["info"]["seed"] ,
-            "CFG scale": meta["cfg_scale"],
-            "Sampler": info["options"]["sd_model_checkpoint"],
-            "Clip skip": info["options"].get("CLIP_stop_at_last_layers", ""),
-            "original_filename": info.get("original_filename", ""),
+                "Steps": meta["steps"],
+                "Seed": info["info"]["seed"] ,
+                "CFG scale": meta["cfg_scale"],
+                "Sampler": info["options"]["sd_model_checkpoint"],
+                "Clip skip": info["options"].get("CLIP_stop_at_last_layers", ""),
+                "original_filename": info.get("original_filename", ""),
+                "prompt_spec": True if info.get("prompt_spec", "") else False,
             }
 
             if not info:

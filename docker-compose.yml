@@ -14,4 +14,7 @@ services:
       - IIB_ACCESS_CONTROL_ALLOWED_PATHS=/data
       - IIB_CACHE_DIR=/cache
       - IIB_DB_PATH=/db/iib.db
+      - DEFAULT_APP_SSH_PRIVATE_KEY=$DEFAULT_APP_SSH_PRIVATE_KEY
+      - DEFAULT_APP_HOST=$DEFAULT_APP_HOST
+      - DEFAULT_APP_PATH=/Applications/Pinta.app/Contents/MacOS/Pinta
     restart: always

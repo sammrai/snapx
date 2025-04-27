@@ -1,0 +1,33 @@
+#!/bin/sh
+
+ssh_private_key=/tmp/ssh_private_key
+echo "$DEFAULT_APP_SSH_PRIVATE_KEY" > $ssh_private_key
+chmod 600 $ssh_private_key
+
+filename=$(basename "$1")
+
+
+cmd() {
+    ssh "$DEFAULT_APP_HOST" -i $ssh_private_key -o StrictHostKeyChecking=no "bash -c \"$*\""
+    return $?
+}
+
+# 最初にscpでファイルを送信
+scp -i $ssh_private_key "$1" "$DEFAULT_APP_HOST:/tmp"
+
+# アプリを実行
+cmd $DEFAULT_APP_PATH "/tmp/$filename" 1>/dev/null 2>/dev/null 
+
+# リモートとローカルのファイルのハッシュを取得
+remote_hash=$(ssh "$DEFAULT_APP_HOST" -i $ssh_private_key -o StrictHostKeyChecking=no "sha256sum /tmp/$filename | awk '{ print \$1 }'")
+local_hash=$(sha256sum "$1" | awk '{ print $1 }')
+
+# ハッシュが異なっていればファイルを戻す
+if [ "$remote_hash" != "$local_hash" ]; then
+    echo "file has changed, copying back"
+    scp -i $ssh_private_key "$DEFAULT_APP_HOST:/tmp/$filename" "$1"
+else
+    echo "file is not changed."
+fi
+
+exit 0
